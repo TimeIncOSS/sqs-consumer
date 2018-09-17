@@ -77,9 +77,9 @@ class Consumer extends EventEmitter {
   }
 
   _poll(secondaryQueue) {
-    const queueUrl = secondaryQueue ? this.secondaryQueueUrl : this.queueUrl;
+    this.activeQueueUrl = secondaryQueue ? this.secondaryQueueUrl : this.queueUrl;
     const receiveParams = {
-      QueueUrl: queueUrl,
+      QueueUrl: this.activeQueueUrl,
       AttributeNames: this.attributeNames,
       MessageAttributeNames: this.messageAttributeNames,
       MaxNumberOfMessages: this.batchSize,
@@ -88,7 +88,7 @@ class Consumer extends EventEmitter {
     };
 
     if (!this.stopped) {
-      debug(`Polling for messages from ${queueUrl}`);
+      debug(`Polling for messages from ${this.activeQueueUrl}`);
       this.sqs.receiveMessage(receiveParams, this._handleSqsResponse);
     } else {
       this.emit('stopped');
